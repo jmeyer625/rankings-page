@@ -10,7 +10,7 @@ $(function (){
 		var pageIndex = pageNumber-1;
 		var renderData = {
 			cols: dataObj.cols,
-			data: dataObj[pageIndex]
+			data: dataObj.pageData[pageIndex]
 		};
 		var tableSource = $('#createTable').text();
 		var tableTemplate = Handlebars.compile(tableSource);
@@ -25,43 +25,43 @@ $(function (){
 		return {arr:pageArray}
 	}
 	
-	var groupData = function(origData, size){
-		var numPages = origData.data.length%size ? Math.floor(origData.data.length/size)+1 : Math.floor(origData.data.length/size)
-		var groupedData = {}
+	var getPages = function(data, pageSize){
+		var numPages = data.showData.length%pageSize ? Math.floor(data.showData.length/pageSize)+1 : Math.floor(data.showData.length/pageSize)
+		var pageArrays = [];
 		for(var i=0; i<numPages; i++) {
 			var newArray = [];
-			for(var j=i*20; j<(i+1)*20; j++) {
-				if(j>=origData.data.length) {
+			for(var j=i*pageSize; j<(i+1)*pageSize; j++) {
+				if(j>=data.data.length) {
 					break;
 				}
-				newArray.push(origData.data[j]);
+				newArray.push(data.showData[j]);
 			}
-		groupedData[i]=newArray;
+			pageArrays.push(newArray);
 		}
-		groupedData['cols']=origData.cols;
-		groupedData.numPages=numPages;
-		return groupedData;
+		data.numPages=numPages;
+		return pageArrays;
 	}
 
-	var filterDataText = function(selection) {
+	var filterDataText = function(selection,data) {
 		var filterIndex = rankingsData.cols.indexOf($('#filterSelect').val());
-		var filteredData = _.filter(rankingsData.data,function(item){
+		data.showData = _.filter(rankingsData.data,function(item){
 			return (item[filterIndex].toLowerCase().indexOf(selection.toLowerCase()) !== -1)
 		});
-		var newData = {};
-		newData.cols = rankingsData.cols;
-		newData.data = filteredData;
-		currentData = groupData(newData,20);
-		updateTable(1,currentData);
-		updatePagination(currentData);
+		data.pageData = getPages(data, 20);
+		updateTable(1,data);
+		updatePagination(data);
 	}
 
-	// var sortData = function(data,parameter) {
-	// 	var sortIndex = data.cols.indexOf($('#sortSelect').val());
-	// 	var sortedData = _.sort(data,function(arr){
-	// 		return arr[sortIndex]===parameter;
-	// 	}
-	// }
+	var sortData = function(data,parameter) {
+		var sortIndex = data.cols.indexOf(parameter);
+		data.showData = _.sortBy(data.showData,function(arr){
+			
+			return arr[sortIndex];
+		})
+		data.pageData = getPages(data,20);
+		return data;
+	}
+	
 	
 	var updatePagination = function(data) {
 		var pageObject = generatePageNumberObject(data.numPages);
@@ -70,18 +70,14 @@ $(function (){
 		$('.pagination').html(paginationTemplate(pageObject));
 	}
 
-	var renderPage = function(data,sortParam,filterParam,page) {
-		var page = page || 1;
-
-	}
-
 	var init = function(pageSize) {
 		var currentPage = 1;
-		var groupedData = groupData(rankingsData, pageSize);
-		updateTable(currentPage,groupedData);
-		updatePagination(groupedData);
-		createSelect(groupedData);
-		return groupedData;
+		rankingsData.showData = rankingsData.data;
+		rankingsData.pageData = getPages(rankingsData, pageSize);
+		updateTable(currentPage,rankingsData);
+		updatePagination(rankingsData);
+		createSelect(rankingsData);
+		return rankingsData;
 	}
 
 	var currentData = init(20);
@@ -124,6 +120,12 @@ $(function (){
 
 	$('#filterInput').keyup(function(){
 		filterDataText($(this).val(),rankingsData);
+	})
+
+	$('#sort').click(function(e){
+		e.preventDefault();
+		rankingsData = sortData(rankingsData,$('#filterSelect').val());
+		updateTable(1,rankingsData);
 	})
 
 
