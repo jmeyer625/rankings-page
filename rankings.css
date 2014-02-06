@@ -1,0 +1,26 @@
+.pagination li {
+	list-style-type: none;
+	display: inline-block;
+	margin: 5px;
+	color: #D62090;
+}
+
+.pagination li:hover{
+	color: #CC8AB1;
+	cursor: pointer;
+}
+
+.rankings-table td, .rankings-table th {
+	width: 150px;
+	text-align: center;
+
+}
+
+.rankings-table td:first-child {
+	text-align: left;
+	padding-left: 60px;
+}
+
+.rankings-table th {
+	text-transform: uppercase;
+}

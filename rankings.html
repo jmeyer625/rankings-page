@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="rankings.css">
+</head>
+<body>
+
+<form>
+	<label>Filter: <input type="text" id="filterInput"></label>
+</form>
+<div class="container" id="mainContainer">
+
+</div>
+<div class="pagination">
+
+</div>
+
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+<script type="text/javascript" src="rankings-data.js"></script>
+<script type="text/javascript" src="rankings.js"></script>
+<script type="text/x-handlebars-template" id="createTable">
+	<table class="rankings-table">
+		<thead>
+			<tr>
+			{{#each cols}}
+				<th>{{this}}</th>
+			{{/each}}
+			</tr>
+		</thead>
+		<tbody>
+			{{#each data}}
+			<tr>
+				{{#each this}}
+				<td>{{this}}</td>
+				{{/each}}
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+
+</script>
+<script type="text/x-handlebars-template" id="createPagination">
+	<ul>
+		<li><a id="first">First</a></li>
+		<li><a id="prev">Prev</a></li>
+		{{#each arr}}
+		<li><a class="page-number">{{this}}</a></li>
+		{{/each}}
+		<li><a id="next">Next</a></li>
+		<li><a id="last">Last</a></li>
+	</ul>
+</script>
+
+<script type="text/x-handlebars-template" id="createFilterOptions">
+	<select id="filterSelect">
+	{{#each cols}}
+		<option>{{this}}</option>
+	{{/each}}
+	</select>
+</script>
+</body>
+</html>
